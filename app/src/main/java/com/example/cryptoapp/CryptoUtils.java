@@ -49,4 +49,5 @@ final public class CryptoUtils {
         String checksum2 = getFileChecksum(md5Digest, f2);
         return checksum1.equals(checksum2);
     }
+
 }

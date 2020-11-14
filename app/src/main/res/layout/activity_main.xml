@@ -34,14 +34,6 @@
             android:inputType="textPassword"/>
     </LinearLayout>
 
-
-<!--    <EditText-->
-<!--        android:id="@+id/inputEditText"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:hint="输入需要加密/解密的文字"-->
-<!--        android:maxLines="2"/>-->
-
     <EditText
         android:id="@+id/inputEditText"
         android:layout_width="fill_parent"
@@ -56,19 +48,26 @@
         android:background="@android:drawable/edit_text"
         android:hint="输入需要加密/解密的文字" />
 
-    <Button
-        android:id="@+id/encryptButton"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="加密"
-        android:textAllCaps="false"/>
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/encryptButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="加密"
+            android:textAllCaps="false"/>
 
-    <Button
-        android:id="@+id/decryptButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="解密"
-        android:textAllCaps="false"/>
+        <Button
+            android:id="@+id/decryptButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="解密"
+            android:textAllCaps="false"/>
+    </LinearLayout>
 
 <!--    <EditText-->
 <!--        android:id="@+id/outputEditText"-->
@@ -89,6 +88,13 @@
         android:scrollbars="vertical"
         android:background="@android:drawable/edit_text"
         android:hint="输出结果" />
+
+    <Button
+        android:id="@+id/copyOutputButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="复制输出结果"
+        android:textAllCaps="false"/>
 
 <!--    <ImageView-->
 <!--        android:id="@+id/imageView"-->

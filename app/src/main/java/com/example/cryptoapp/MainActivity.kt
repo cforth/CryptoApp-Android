@@ -1,5 +1,9 @@
 package com.example.cryptoapp
 
+import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,11 +15,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.Exception
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         encryptButton.setOnClickListener(this)
         decryptButton.setOnClickListener(this)
+        copyOutputButton.setOnClickListener(this)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -57,6 +63,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 // 测试图片切换
 //                imageView.setImageResource(R.drawable.img_1)
             }
+
+            R.id.copyOutputButton -> {
+                try {
+                    val textToCopy = outputEditText.text.toString()
+                    copyToClipboard(textToCopy)
+                } catch(e:Exception) {
+                    Log.d("Copy Output Error", "copy text exception")
+                    outputEditText.setText("")
+                    Toast.makeText(this, "Copy text exception", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
+    }
+
+    @SuppressLint("ServiceCast")
+    fun copyToClipboard(textToCopy: String) {
+        Log.d("textToCopy", textToCopy)
+        val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipData = ClipData.newPlainText("Label", textToCopy)
+        clipboardManager.setPrimaryClip(clipData)
+        // Toast 提示
+        Toast.makeText(this,"Copied to clipboard",Toast.LENGTH_SHORT).show()
     }
 }
