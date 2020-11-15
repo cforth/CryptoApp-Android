@@ -9,7 +9,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.example.cryptoapp.MainActivity">
+        <activity
+            android:name=".PicActivity"
+            android:label="CryptoApp"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".TextActivity"
+            android:label="CryptoApp"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".FileActivity"
+            android:label="CryptoApp"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".MainActivity"
+            android:label="CryptoApp"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

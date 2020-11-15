@@ -1,53 +1,53 @@
 package com.example.cryptoapp
 
-import android.annotation.SuppressLint
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
 import android.content.Intent
-import android.os.Build
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import kotlinx.android.synthetic.main.activity_main.*
+import org.w3c.dom.Text
 import kotlin.system.exitProcess
 
-class MainActivity : AppCompatActivity() {
-
+class FileActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_file)
         setSupportActionBar(toolbar)
         supportActionBar?.let {
             it.setDisplayHomeAsUpEnabled(true)
             it.setHomeAsUpIndicator(R.drawable.ic_menu)
         }
-//        navView.setCheckedItem(R.id.navTextLayout)
+//        navView.setCheckedItem(R.id.navFileLayout)
         navView.setNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.navTextLayout -> {
                     val intent = Intent(this, TextActivity::class.java)
+                    this.finish()
                     startActivity(intent)
                 }
                 R.id.navFileLayout -> {
                     val intent = Intent(this, FileActivity::class.java)
+                    this.finish()
                     startActivity(intent)
                 }
                 R.id.navPicLayout -> {
-                    val intent = Intent(this, FileActivity::class.java)
+                    val intent = Intent(this, PicActivity::class.java)
+                    this.finish()
                     startActivity(intent)
                 }
             }
             drawerLayout.closeDrawers()
             true
         }
+    }
+
+    override fun onClick(v: View?) {
+        TODO("Not yet implemented")
     }
 
 
