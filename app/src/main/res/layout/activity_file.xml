@@ -29,7 +29,89 @@
             android:textSize="24sp"
             android:text="文件加密解密"/>
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp">
 
+            <TextView
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textSize="18sp"
+                android:text="输入密码:" />
+
+            <EditText
+                android:id="@+id/passwordEditText"
+                android:layout_width="500dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:inputType="textPassword"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp">
+
+            <Button
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:id="@+id/readFileButton"
+                android:text="读取文件"/>
+
+            <EditText
+                android:id="@+id/readPathEditText"
+                android:layout_width="500dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="60dp">
+
+            <Button
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:id="@+id/saveFileButton"
+                android:text="写入文件"/>
+
+            <EditText
+                android:id="@+id/savePathEditText"
+                android:layout_width="500dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/encryptButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="加密"
+                android:textAllCaps="false"/>
+
+            <Button
+                android:id="@+id/decryptButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="解密"
+                android:textAllCaps="false"/>
+        </LinearLayout>
 
     </LinearLayout>
 

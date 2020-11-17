@@ -1,5 +1,8 @@
 package com.example.cryptoapp
 
+import android.util.Log
+import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_text.*
 import java.io.File
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
@@ -14,31 +17,39 @@ class FileCrypto(_password: String, _useMD5:Boolean=true, _useUrlSafe:Boolean=tr
     private val cipher = Cipher.getInstance("AES")
 
     //文件处理
-    private fun fileHandler(inputPath:String, outputPath:String,
+    private fun fileHandler(inputFile:File, outputFile:File,
                     eachBlockHandler:(ByteArray)-> ByteArray,
                     endBlockHandler:(ByteArray)-> ByteArray,
-                    blockSize:Int=10*1024*1024) {
-        val inputFile = File(inputPath)
-        val outputFile = File(outputPath)
+                    blockSize:Int=10*1024*1024): Boolean {
+
         val fileProgress = FileHandlerProgress(inputFile.length())
 
         if (inputFile.exists()) {
             if (!outputFile.exists()) {
-                inputFile.forEachBlock (blockSize) { fileBytes: ByteArray, bytesRead: Int ->
-                    if (bytesRead == blockSize) {
-                        outputFile.appendBytes(eachBlockHandler(fileBytes))
-                    } else {
-                        outputFile.appendBytes(endBlockHandler(fileBytes.sliceArray(0 until bytesRead)))
+                try {
+                    inputFile.forEachBlock (blockSize) { fileBytes: ByteArray, bytesRead: Int ->
+                        if (bytesRead == blockSize) {
+                            outputFile.appendBytes(eachBlockHandler(fileBytes))
+                        } else {
+                            outputFile.appendBytes(endBlockHandler(fileBytes.sliceArray(0 until bytesRead)))
+                        }
+                        fileProgress.update(bytesRead.toLong())
+                        // fileProgress.getStatus()
                     }
-                    fileProgress.update(bytesRead.toLong())
-                    // fileProgress.getStatus()
+                } catch (e: Exception) {
+                    Log.d("Encrypt Error", "encrypt text exception")
+                    return false
                 }
+
             } else {
-                println("$outputFile is exists!")
+                println("outputFile is exists!")
+                return false
             }
         } else {
-            println("$inputFile is not exists!")
+            println("inputFile is not exists!")
+            return false
         }
+        return true
     }
 
     private fun update(fileBytes: ByteArray):ByteArray {
@@ -50,14 +61,14 @@ class FileCrypto(_password: String, _useMD5:Boolean=true, _useUrlSafe:Boolean=tr
     }
 
     //加密
-    fun encrypt(inputPath:String, outputPath:String) {
+    fun encrypt(inputFile:File, outputFile:File): Boolean {
         cipher.init(Cipher.ENCRYPT_MODE,keySpec)
-        fileHandler(inputPath, outputPath, ::update, ::doFinal)
+        return fileHandler(inputFile, outputFile, ::update, ::doFinal)
     }
 
     //解密
-    fun decrypt(inputPath:String, outputPath:String) {
+    fun decrypt(inputFile:File, outputFile:File): Boolean {
         cipher.init(Cipher.DECRYPT_MODE,keySpec)
-        fileHandler(inputPath, outputPath, ::update, ::doFinal)
+        return fileHandler(inputFile, outputFile, ::update, ::doFinal)
     }
 }
