@@ -1,9 +1,8 @@
-package com.example.cryptoapp
-
 import android.util.Log
-import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_text.*
+import com.example.cryptoapp.MessageDigestUtils
 import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
@@ -17,36 +16,23 @@ class FileCrypto(_password: String, _useMD5:Boolean=true, _useUrlSafe:Boolean=tr
     private val cipher = Cipher.getInstance("AES")
 
     //文件处理
-    private fun fileHandler(inputFile:File, outputFile:File,
-                    eachBlockHandler:(ByteArray)-> ByteArray,
-                    endBlockHandler:(ByteArray)-> ByteArray,
-                    blockSize:Int=10*1024*1024): Boolean {
+    private fun fileHandler(inputFileStream:FileInputStream, outputFileStream: FileOutputStream,
+                            eachBlockHandler:(ByteArray)-> ByteArray,
+                            endBlockHandler:(ByteArray)-> ByteArray,
+                            blockSize:Int=10*1024*1024): Boolean {
 
-        val fileProgress = FileHandlerProgress(inputFile.length())
-
-        if (inputFile.exists()) {
-            if (!outputFile.exists()) {
-                try {
-                    inputFile.forEachBlock (blockSize) { fileBytes: ByteArray, bytesRead: Int ->
-                        if (bytesRead == blockSize) {
-                            outputFile.appendBytes(eachBlockHandler(fileBytes))
-                        } else {
-                            outputFile.appendBytes(endBlockHandler(fileBytes.sliceArray(0 until bytesRead)))
-                        }
-                        fileProgress.update(bytesRead.toLong())
-                        // fileProgress.getStatus()
-                    }
-                } catch (e: Exception) {
-                    Log.d("Encrypt Error", "encrypt text exception")
-                    return false
+        try {
+            var len = -1
+            val buffer = ByteArray(blockSize)
+            while (((inputFileStream.read(buffer)).also { len = it }) != -1) {
+                if (len == blockSize) {
+                    outputFileStream.write(eachBlockHandler(buffer))
+                } else {
+                    outputFileStream.write(endBlockHandler(buffer.sliceArray(0 until len)))
                 }
-
-            } else {
-                println("outputFile is exists!")
-                return false
             }
-        } else {
-            println("inputFile is not exists!")
+        } catch (e: Exception) {
+            Log.d("Encrypt Error", "encrypt text exception")
             return false
         }
         return true
@@ -60,15 +46,49 @@ class FileCrypto(_password: String, _useMD5:Boolean=true, _useUrlSafe:Boolean=tr
         return cipher.doFinal(fileBytes)
     }
 
-    //加密
-    fun encrypt(inputFile:File, outputFile:File): Boolean {
-        cipher.init(Cipher.ENCRYPT_MODE,keySpec)
-        return fileHandler(inputFile, outputFile, ::update, ::doFinal)
+    //从文件路径加密
+    fun encrypt(inputPath:String, outputPath:String): Boolean {
+        val inputFile = File(inputPath)
+        val outputFile = File(outputPath)
+        return encrypt(inputFile, outputFile)
     }
 
-    //解密
+    //从文件路径解密
+    fun decrypt(inputPath:String, outputPath:String): Boolean {
+        val inputFile = File(inputPath)
+        val outputFile = File(outputPath)
+        return decrypt(inputFile, outputFile)
+    }
+
+    //从File对象加密
+    fun encrypt(inputFile:File, outputFile:File): Boolean {
+        val inputFileStream = FileInputStream(inputFile)
+        val outputFileStream = FileOutputStream(outputFile)
+        val result = encrypt(inputFileStream, outputFileStream)
+        inputFileStream.close()
+        outputFileStream.close()
+        return result
+    }
+
+    //从File对象解密
     fun decrypt(inputFile:File, outputFile:File): Boolean {
+        val inputFileStream = FileInputStream(inputFile)
+        val outputFileStream = FileOutputStream(outputFile)
+        val result = decrypt(inputFileStream, outputFileStream)
+        inputFileStream.close()
+        outputFileStream.close()
+        return result
+    }
+
+    // 从FileInputStream对象加密
+    fun encrypt(inputFileStream:FileInputStream, outputFileStream: FileOutputStream): Boolean {
+        cipher.init(Cipher.ENCRYPT_MODE,keySpec)
+        return fileHandler(inputFileStream, outputFileStream, ::update, ::doFinal)
+    }
+
+    // 从FileInputStream对象解密
+    fun decrypt(inputFileStream:FileInputStream, outputFileStream: FileOutputStream): Boolean {
         cipher.init(Cipher.DECRYPT_MODE,keySpec)
-        return fileHandler(inputFile, outputFile, ::update, ::doFinal)
+        return fileHandler(inputFileStream, outputFileStream, ::update, ::doFinal)
     }
 }

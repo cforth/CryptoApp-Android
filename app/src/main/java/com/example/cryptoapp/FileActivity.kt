@@ -1,12 +1,11 @@
 package com.example.cryptoapp
 
+import FileCrypto
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,7 +18,6 @@ import kotlinx.android.synthetic.main.activity_file.passwordEditText
 import kotlinx.android.synthetic.main.activity_main.drawerLayout
 import kotlinx.android.synthetic.main.activity_main.navView
 import kotlinx.android.synthetic.main.activity_main.toolbar
-import kotlinx.android.synthetic.main.activity_text.*
 import java.io.*
 
 class FileActivity : AppCompatActivity(), View.OnClickListener {
@@ -131,75 +129,47 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
     }
 
     private fun fileEncrypt(uri: Uri){
-        val inputTempFile = File(cacheDir, "inputTempFile")
         val inputFileResolver = contentResolver.openFileDescriptor(uri, "r")
-        inputFileResolver?.fileDescriptor?.let {
-            val fi = FileInputStream(it)
-            val fo = inputTempFile.outputStream()
-            fi.copyTo(fo)
-            fi.close()
-            fo.close()
+        val outputFileResolver = contentResolver.openFileDescriptor(toFileUri!!, "w")
+        val password = passwordEditText.text.toString()
+        if (outputFileResolver != null) {
+            val outputFileStream = FileOutputStream(outputFileResolver.fileDescriptor)
+            inputFileResolver?.fileDescriptor?.let {
+                val fileInputStream = FileInputStream(it)
+                val successFlag = FileCrypto(password).encrypt(fileInputStream, outputFileStream)
+                if (successFlag) {
+                    Toast.makeText(this, "文件加密已完成", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "文件加密发生错误", Toast.LENGTH_SHORT).show()
+                }
+                fileInputStream.close()
+            }
+            outputFileStream.close()
         }
         inputFileResolver?.close()
-
-        val password = passwordEditText.text.toString()
-
-        //val outFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "tempout")
-        if (toFileUri != null) {
-            val outputTempFile = File(cacheDir, "outputTempFile")
-            val successFlag = FileCrypto(password).encrypt(inputTempFile, outputTempFile)
-            if (successFlag) {
-                val outputFileResolver = contentResolver.openFileDescriptor(toFileUri!!, "w")
-                outputFileResolver?.fileDescriptor?.let {
-                    val foo = FileOutputStream(it)
-                    val fii = FileInputStream(outputTempFile)
-                    fii.copyTo(foo)
-                    fii.close()
-                    foo.close()
-                }
-                Toast.makeText(this, "文件加密已完成", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "文件加密发生错误", Toast.LENGTH_SHORT).show()
-            }
-            outputTempFile.delete()
-        }
-        inputTempFile.delete()
+        outputFileResolver?.close()
     }
 
     private fun fileDecrypt(uri: Uri){
-        val inputTempFile = File(cacheDir, "inputTempFile")
         val inputFileResolver = contentResolver.openFileDescriptor(uri, "r")
-        inputFileResolver?.fileDescriptor?.let {
-            val fi = FileInputStream(it)
-            val fo = inputTempFile.outputStream()
-            fi.copyTo(fo)
-            fi.close()
-            fo.close()
+        val outputFileResolver = contentResolver.openFileDescriptor(toFileUri!!, "w")
+        val password = passwordEditText.text.toString()
+        if (outputFileResolver != null) {
+            val outputFileStream = FileOutputStream(outputFileResolver.fileDescriptor)
+            inputFileResolver?.fileDescriptor?.let {
+                val fileInputStream = FileInputStream(it)
+                val successFlag = FileCrypto(password).decrypt(fileInputStream, outputFileStream)
+                if (successFlag) {
+                    Toast.makeText(this, "文件解密已完成", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "文件解密发生错误", Toast.LENGTH_SHORT).show()
+                }
+                fileInputStream.close()
+            }
+            outputFileStream.close()
         }
         inputFileResolver?.close()
-
-        val password = passwordEditText.text.toString()
-
-        //val outFile = File(getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "tempout")
-        if (toFileUri != null) {
-            val outputTempFile = File(cacheDir, "outputTempFile")
-            val successFlag = FileCrypto(password).decrypt(inputTempFile, outputTempFile)
-            if (successFlag) {
-                val outputFileResolver = contentResolver.openFileDescriptor(toFileUri!!, "w")
-                outputFileResolver?.fileDescriptor?.let {
-                    val foo = FileOutputStream(it)
-                    val fii = FileInputStream(outputTempFile)
-                    fii.copyTo(foo)
-                    fii.close()
-                    foo.close()
-                }
-                Toast.makeText(this, "文件解密已完成", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "文件解密发生错误", Toast.LENGTH_SHORT).show()
-            }
-            outputTempFile.delete()
-        }
-        inputTempFile.delete()
+        outputFileResolver?.close()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
