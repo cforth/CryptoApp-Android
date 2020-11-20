@@ -111,6 +111,12 @@
                 android:layout_weight="1"
                 android:text="解密"
                 android:textAllCaps="false"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
         </LinearLayout>
 
     </LinearLayout>

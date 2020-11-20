@@ -32,7 +32,7 @@ class FileCrypto(_password: String, _useMD5:Boolean=true, _useUrlSafe:Boolean=tr
                 }
             }
         } catch (e: Exception) {
-            Log.d("Encrypt Error", "encrypt text exception")
+            Log.d("FileCrypto Error", "FileCrypto exception")
             return false
         }
         return true

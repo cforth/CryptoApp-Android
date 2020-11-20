@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Message
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -19,12 +21,39 @@ import kotlinx.android.synthetic.main.activity_main.drawerLayout
 import kotlinx.android.synthetic.main.activity_main.navView
 import kotlinx.android.synthetic.main.activity_main.toolbar
 import java.io.*
+import java.lang.ref.WeakReference
+import kotlin.concurrent.thread
 
 class FileActivity : AppCompatActivity(), View.OnClickListener {
     private val REQUEST_CODE_FOR_LOAD_FILE = 1
     private val REQUEST_CODE_FOR_CREATE_FILE = 2
     private var fromFileUri: Uri? = null
     private var toFileUri: Uri? = null
+    private val startProgress = 1
+    private val finishProgress = 2
+    private val cryptoFinishToastMessage = 3
+    private val cryptoErrorToastMessage = 4
+    private val handler = MyHandler(this)
+
+    //防止Handler造成的内存泄露，使用内部类
+    private class MyHandler(activity: FileActivity) : Handler() {
+        private val mActivity: WeakReference<FileActivity> = WeakReference(activity)
+
+        override fun handleMessage(msg: Message) {
+            if (mActivity.get() == null) {
+                return
+            }
+            val activity = mActivity.get()
+            if (activity != null) {
+                when (msg.what) {
+                    activity.startProgress -> activity.progressBar.visibility = View.VISIBLE
+                    activity.finishProgress -> activity.progressBar.visibility = View.GONE
+                    activity.cryptoFinishToastMessage -> Toast.makeText(activity, "任务已完成", Toast.LENGTH_SHORT).show()
+                    activity.cryptoErrorToastMessage -> Toast.makeText(activity, "任务发生错误", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,19 +100,37 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
                 setToFileUri()
             }
             R.id.encryptButton -> {
-                if (toFileUri != null) {
-                    fromFileUri?.let { fileEncrypt(it) }
-                } else {
-                    Toast.makeText(this, "加密输出文件路径不存在", Toast.LENGTH_SHORT).show()
-                }
+                fileCryptoTask("ENCRYPT")
             }
             R.id.decryptButton -> {
-                if (toFileUri != null) {
-                    fromFileUri?.let { fileDecrypt(it) }
+                fileCryptoTask("DECRYPT")
+            }
+        }
+    }
+
+    private fun fileCryptoTask(option: String) {
+        if (toFileUri != null && fromFileUri != null) {
+            thread {
+                val startMsg = Message()
+                startMsg.what = startProgress
+                handler.sendMessage(startMsg)
+                val flag = fileHandle(fromFileUri!!, option)
+                println(flag)
+                val finishMsg = Message()
+                finishMsg.what = finishProgress
+                handler.sendMessage(finishMsg)
+                if (flag) {
+                    val cryptoFinishMsg = Message()
+                    cryptoFinishMsg.what = cryptoFinishToastMessage
+                    handler.sendMessage(cryptoFinishMsg)
                 } else {
-                    Toast.makeText(this, "解密输出文件路径不存在", Toast.LENGTH_SHORT).show()
+                    val cryptoErrorMsg = Message()
+                    cryptoErrorMsg.what = cryptoErrorToastMessage
+                    handler.sendMessage(cryptoErrorMsg)
                 }
             }
+        } else {
+            Toast.makeText(this, "输入或输出路径错误", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -128,19 +175,19 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    private fun fileEncrypt(uri: Uri){
+    private fun fileHandle(uri: Uri, option: String): Boolean {
         val inputFileResolver = contentResolver.openFileDescriptor(uri, "r")
         val outputFileResolver = contentResolver.openFileDescriptor(toFileUri!!, "w")
         val password = passwordEditText.text.toString()
+        var successFlag = false
         if (outputFileResolver != null) {
             val outputFileStream = FileOutputStream(outputFileResolver.fileDescriptor)
             inputFileResolver?.fileDescriptor?.let {
                 val fileInputStream = FileInputStream(it)
-                val successFlag = FileCrypto(password).encrypt(fileInputStream, outputFileStream)
-                if (successFlag) {
-                    Toast.makeText(this, "文件加密已完成", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "文件加密发生错误", Toast.LENGTH_SHORT).show()
+                if (option == "ENCRYPT") {
+                    successFlag = FileCrypto(password).encrypt(fileInputStream, outputFileStream)
+                } else if (option == "DECRYPT"){
+                    successFlag = FileCrypto(password).decrypt(fileInputStream, outputFileStream)
                 }
                 fileInputStream.close()
             }
@@ -148,28 +195,7 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
         }
         inputFileResolver?.close()
         outputFileResolver?.close()
-    }
-
-    private fun fileDecrypt(uri: Uri){
-        val inputFileResolver = contentResolver.openFileDescriptor(uri, "r")
-        val outputFileResolver = contentResolver.openFileDescriptor(toFileUri!!, "w")
-        val password = passwordEditText.text.toString()
-        if (outputFileResolver != null) {
-            val outputFileStream = FileOutputStream(outputFileResolver.fileDescriptor)
-            inputFileResolver?.fileDescriptor?.let {
-                val fileInputStream = FileInputStream(it)
-                val successFlag = FileCrypto(password).decrypt(fileInputStream, outputFileStream)
-                if (successFlag) {
-                    Toast.makeText(this, "文件解密已完成", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(this, "文件解密发生错误", Toast.LENGTH_SHORT).show()
-                }
-                fileInputStream.close()
-            }
-            outputFileStream.close()
-        }
-        inputFileResolver?.close()
-        outputFileResolver?.close()
+        return successFlag
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
