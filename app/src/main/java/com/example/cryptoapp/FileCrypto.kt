@@ -1,5 +1,6 @@
+package com.example.cryptoapp
+
 import android.util.Log
-import com.example.cryptoapp.MessageDigestUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

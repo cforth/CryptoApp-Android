@@ -12,13 +12,16 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.view.GravityCompat
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.drawerLayout
 import kotlinx.android.synthetic.main.activity_main.navView
 import kotlinx.android.synthetic.main.activity_main.toolbar
 import kotlinx.android.synthetic.main.activity_text.*
+import kotlinx.android.synthetic.main.activity_text.decryptButton
+import kotlinx.android.synthetic.main.activity_text.encryptButton
+import kotlinx.android.synthetic.main.activity_text.passwordEditText
 
 class TextActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,17 +71,8 @@ class TextActivity : AppCompatActivity(), View.OnClickListener {
                 } catch (e: Exception) {
                     Log.d("Encrypt Error", "encrypt text exception")
                     outputEditText.setText("")
-                    Toast.makeText(this, "Encrypt text exception", Toast.LENGTH_SHORT).show()
+                    Snackbar.make(textView, "加密文本时出现错误", Snackbar.LENGTH_SHORT).show()
                 }
-//                // 测试图片切换
-//                imageView.setImageResource(R.drawable.img_2)
-                // 测试进度条
-//                if (progressBar.visibility == View.VISIBLE) {
-//                    progressBar.visibility = View.GONE
-//                } else {
-//                    progressBar.visibility = View.VISIBLE
-//                }
-//                progressBar.progress = progressBar.progress + 10
             }
 
             R.id.decryptButton -> {
@@ -90,10 +84,8 @@ class TextActivity : AppCompatActivity(), View.OnClickListener {
                 } catch (e: Exception) {
                     Log.d("Decrypt Error", "decrypt text exception")
                     outputEditText.setText("")
-                    Toast.makeText(this, "Decrypt text exception", Toast.LENGTH_SHORT).show()
+                    Snackbar.make(textView, "解密文本时出现错误", Snackbar.LENGTH_SHORT).show()
                 }
-                // 测试图片切换
-//                imageView.setImageResource(R.drawable.img_1)
             }
 
             R.id.copyOutputButton -> {
@@ -103,7 +95,7 @@ class TextActivity : AppCompatActivity(), View.OnClickListener {
                 } catch (e: Exception) {
                     Log.d("Copy Output Error", "copy text exception")
                     outputEditText.setText("")
-                    Toast.makeText(this, "Copy text exception", Toast.LENGTH_SHORT).show()
+                    Snackbar.make(textView, "复制输出文本时出现错误", Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
@@ -115,8 +107,7 @@ class TextActivity : AppCompatActivity(), View.OnClickListener {
         val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clipData = ClipData.newPlainText("Label", textToCopy)
         clipboardManager.setPrimaryClip(clipData)
-        // Toast 提示
-        Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+        Snackbar.make(textView, "输出文本已复制", Snackbar.LENGTH_SHORT).show()
     }
 
 

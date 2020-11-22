@@ -12,4 +12,22 @@
         android:src="@drawable/nav_icon"
         android:layout_centerInParent="true" />
 
+    <TextView
+        android:id="@+id/appInfoText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="保护手机的资料安全"
+        android:textColor="#FFF"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/appNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/appInfoText"
+        android:text="CryptoApp V1.0"
+        android:textColor="#FFF"
+        android:textSize="14sp" />
+
 </RelativeLayout>

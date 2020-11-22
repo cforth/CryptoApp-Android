@@ -1,6 +1,5 @@
 package com.example.cryptoapp
 
-import FileCrypto
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -11,8 +10,8 @@ import android.os.Message
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.GravityCompat
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_file.*
 import kotlinx.android.synthetic.main.activity_file.decryptButton
 import kotlinx.android.synthetic.main.activity_file.encryptButton
@@ -48,8 +47,8 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
                 when (msg.what) {
                     activity.startProgress -> activity.progressBar.visibility = View.VISIBLE
                     activity.finishProgress -> activity.progressBar.visibility = View.GONE
-                    activity.cryptoFinishToastMessage -> Toast.makeText(activity, "任务已完成", Toast.LENGTH_SHORT).show()
-                    activity.cryptoErrorToastMessage -> Toast.makeText(activity, "任务发生错误", Toast.LENGTH_SHORT).show()
+                    activity.cryptoFinishToastMessage -> Snackbar.make(activity.fileView, "任务已完成", Snackbar.LENGTH_SHORT).show()
+                    activity.cryptoErrorToastMessage -> Snackbar.make(activity.fileView, "任务发生错误", Snackbar.LENGTH_SHORT).show()
                 }
             }
         }
@@ -130,7 +129,7 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         } else {
-            Toast.makeText(this, "输入或输出路径错误", Toast.LENGTH_SHORT).show()
+            Snackbar.make(fileView, "输入或输出路径错误", Snackbar.LENGTH_SHORT).show()
         }
     }
 
@@ -146,7 +145,7 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
         val intent =Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "*/*"
-        intent.putExtra(Intent.EXTRA_TITLE,"saveFileName")
+        intent.putExtra(Intent.EXTRA_TITLE,"OutPutName")
         startActivityForResult(intent, REQUEST_CODE_FOR_CREATE_FILE)
     }
 
@@ -159,7 +158,6 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
                     data.data?.let { uri ->
                         readPathEditText.setText(FileUtil.uriToFileName(uri, this))
                         fromFileUri = uri
-                        //Toast.makeText(this, fromFileUri.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -168,7 +166,6 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
                     data.data?.let { uri ->
                         savePathEditText.setText(FileUtil.uriToFileName(uri, this))
                         toFileUri = uri
-                        //Toast.makeText(this, toFileUri.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
