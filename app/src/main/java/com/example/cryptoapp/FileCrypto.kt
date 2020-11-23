@@ -93,3 +93,29 @@ class FileCrypto(_password: String, _useMD5:Boolean=true, _useUrlSafe:Boolean=tr
         return fileHandler(inputFileStream, outputFileStream, ::update, ::doFinal)
     }
 }
+
+
+// 字节数组加密解密
+class BytesCrypto(_password: String, _useMD5:Boolean=true, _useUrlSafe:Boolean=true) {
+    private val useUrlSafe = _useUrlSafe
+
+    //根据参数选择是否转为MD5值
+    private val passByteArray =
+        if (_useMD5) MessageDigestUtils.md5(_password) else _password.toByteArray()
+
+    //初始化:加密/解密
+    private val keySpec: SecretKeySpec = SecretKeySpec(passByteArray, "AES")
+
+    fun encrypt(inputBytes: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance("AES")
+        cipher.init(Cipher.ENCRYPT_MODE,keySpec)
+        return cipher.doFinal(inputBytes)
+    }
+
+    fun decrypt(inputBytes: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance("AES")
+        cipher.init(Cipher.DECRYPT_MODE,keySpec)
+        return cipher.doFinal(inputBytes)
+    }
+
+}

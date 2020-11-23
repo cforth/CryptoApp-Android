@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
                     startActivity(intent)
                 }
                 R.id.navPicLayout -> {
-                    val intent = Intent(this, FileActivity::class.java)
+                    val intent = Intent(this, PicActivity::class.java)
                     startActivity(intent)
                 }
             }
