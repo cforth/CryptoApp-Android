@@ -30,14 +30,14 @@
                     android:gravity="center"
                     android:textColor="#3F51B5"
                     android:textSize="24sp"
-                    android:text="世界上只有两样东西值得我们敬畏:\n一个是我们心中崇尚的道德准则，\n一个是我们头顶的星空。——康德"/>
+                    android:text="\n\n"/>
 
                 <ImageView
                     android:id="@+id/mainImageView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:src="@drawable/main"
+                    android:src="@drawable/nav_icon"
                     />
 
             </LinearLayout>

@@ -111,7 +111,7 @@ class PicActivity : AppCompatActivity(), View.OnClickListener {
                     decryptImageView.setImageBitmap(decryptPicBitmap)
                 } catch (e: Exception) {
                     Log.d("Decrypt Error", "decrypt img exception")
-                    decryptImageView.setImageBitmap(BitmapFactory.decodeResource(this.resources, R.drawable.nav_icon))
+                    decryptImageView.setImageBitmap(BitmapFactory.decodeResource(this.resources, R.drawable.error_img))
                     Snackbar.make(decryptImageView, "解密图片时出现错误", Snackbar.LENGTH_SHORT).show()
                 }
             }
