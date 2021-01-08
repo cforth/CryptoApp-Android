@@ -9,7 +9,7 @@
         android:id="@+id/iconImge"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:src="@drawable/nav_icon"
+        android:src="@drawable/logo"
         android:layout_centerInParent="true" />
 
     <TextView
@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/appInfoText"
-        android:text="CryptoApp V1.2.2"
+        android:text="CryptoApp V1.2.3"
         android:textColor="#FFF"
         android:textSize="14sp" />
 

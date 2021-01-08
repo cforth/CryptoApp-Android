@@ -3,13 +3,16 @@ package com.example.cryptoapp
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.core.view.GravityCompat
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_file.*
@@ -19,6 +22,7 @@ import kotlinx.android.synthetic.main.activity_file.passwordEditText
 import kotlinx.android.synthetic.main.activity_main.drawerLayout
 import kotlinx.android.synthetic.main.activity_main.navView
 import kotlinx.android.synthetic.main.activity_main.toolbar
+import kotlinx.android.synthetic.main.activity_text.*
 import java.io.*
 import java.lang.ref.WeakReference
 import kotlin.concurrent.thread
@@ -90,6 +94,7 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
         decryptButton.setOnClickListener(this)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.readFileButton -> {
@@ -141,11 +146,21 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setToFileUri() {
+        val password = passwordEditText.text.toString()
+        val readName = readPathEditText.text.toString()
+        // 通过输入文件名是否包含特殊后缀来判断输出文件名默认值是加密还是解密后的字符串
+        val outputName = if (readName.contains(".cf", ignoreCase = true)) {
+            fileNameHandle(readName.substring(0, readName.lastIndexOf('.')), password, "DECRYPT")
+        } else {
+            fileNameHandle(readName, password, "ENCRYPT") + ".cf"
+        }
+
         val intent =Intent(Intent.ACTION_CREATE_DOCUMENT)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "*/*"
-        intent.putExtra(Intent.EXTRA_TITLE,"OutPutName")
+        intent.putExtra(Intent.EXTRA_TITLE, outputName)
         startActivityForResult(intent, REQUEST_CODE_FOR_CREATE_FILE)
     }
 
@@ -170,6 +185,29 @@ class FileActivity : AppCompatActivity(), View.OnClickListener {
                 }
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun fileNameHandle(inputName: String, password:String, option: String): String {
+        var outputName = ""
+        if (option == "ENCRYPT") {
+            outputName = try {
+                StringCrypto(password).encrypt(inputName)
+            } catch (e: Exception) {
+                Log.d("Encrypt Error", "Encrypt input name exception!")
+                "EncryptNameError"
+            }
+        } else if (option == "DECRYPT"){
+            outputName = try {
+                StringCrypto(password).decrypt(inputName)
+            } catch (e: Exception) {
+                Log.d("Decrypt Error", "Decrypt input name exception!")
+                "DecryptNameError"
+            }
+        } else {
+            outputName = ""
+        }
+        return outputName
     }
 
     private fun fileHandle(uri: Uri, option: String): Boolean {
